@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dice Game vs Computer</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #2c3e50, #3498db);
+      color: white;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    /* NAVIGATION BAR */
+    nav {
+      width: 100%;
+      background-color: #1a252f;
+      display: flex;
+      justify-content: center;
+      padding: 1rem 0;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 20px;
+      font-size: 1.1rem;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #1abc9c;
+    }
+
+    /* MAIN CONTENT */
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: calc(100vh - 80px);
+    }
+
+    h1 {
+      margin-top: 30px;
+    }
+
+    .dice-row {
+      display: flex;
+      gap: 40px;
+      margin: 20px 0;
+    }
+
+    .dice {
+      width: 100px;
+      height: 100px;
+      background-color: #fff;
+      color: #333;
+      font-size: 3rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      user-select: none;
+      transition: transform 0.3s ease;
+    }
+
+    .scoreboard {
+      font-size: 1.4rem;
+    }
+
+    .winner {
+      margin-top: 20px;
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    .roll-text {
+      position: absolute;
+      bottom: 30px;
+      font-size: 1.2rem;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="arizona.html">Arizona</a>
+    <a href="game.html">Dice Game</a>
+  </nav>
+
+  <!-- MAIN GAME -->
+  <div class="container">
+    <h1>Dice Game: You vs Computer</h1>
+
+    <div class="dice-row">
+      <div>
+        <div class="dice" id="playerDice">🎲</div>
+        <div>You</div>
+      </div>
+      <div>
+        <div class="dice" id="computerDice">🎲</div>
+        <div>Computer</div>
+      </div>
+    </div>
+
+    <div class="scoreboard" id="scoreboard">
+      You: 0 | Computer: 0
+    </div>
+
+    <div class="winner" id="winnerMessage"></div>
+    <div class="roll-text">Click anywhere to roll</div>
+  </div>
+
+  <script>
+    const playerDice = document.getElementById("playerDice");
+    const computerDice = document.getElementById("computerDice");
+    const scoreboard = document.getElementById("scoreboard");
+    const winnerMessage = document.getElementById("winnerMessage");
+    const diceFaces = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+
+    let playerScore = 0;
+    let computerScore = 0;
+    let gameOver = false;
+    let rolling = false;
+
+    function animateDice(diceElement, intervalObj) {
+      let count = 0;
+      intervalObj.id = setInterval(() => {
+        const randomIndex = Math.floor(Math.random() * 6);
+        diceElement.textContent = diceFaces[randomIndex];
+        count++;
+        if (count >= 10) {
+          clearInterval(intervalObj.id);
+        }
+      }, 50);
+    }
+
+    function rollDice() {
+      if (rolling) return;
+
+      if (gameOver) {
+        // Reset the game
+        playerScore = 0;
+        computerScore = 0;
+        gameOver = false;
+        winnerMessage.textContent = "";
+        scoreboard.textContent = `You: 0 | Computer: 0`;
+        playerDice.textContent = "🎲";
+        computerDice.textContent = "🎲";
+        return;
+      }
+
+      rolling = true;
+
+      const playerAnim = {};
+      const computerAnim = {};
+      animateDice(playerDice, playerAnim);
+      animateDice(computerDice, computerAnim);
+
+      setTimeout(() => {
+        const playerRoll = Math.floor(Math.random() * 6);
+        const computerRoll = Math.floor(Math.random() * 6);
+
+        playerDice.textContent = diceFaces[playerRoll];
+        computerDice.textContent = diceFaces[computerRoll];
+
+        playerScore += playerRoll + 1;
+        computerScore += computerRoll + 1;
+
+        scoreboard.textContent = `You: ${playerScore} | Computer: ${computerScore}`;
+
+        if (playerScore >= 50 || computerScore >= 50) {
+          gameOver = true;
+          if (playerScore >= 50 && computerScore >= 50) {
+            winnerMessage.textContent = "It's a tie!";
+          } else if (playerScore >= 50) {
+            winnerMessage.textContent = "You win! 🎉 Click to play again.";
+          } else {
+            winnerMessage.textContent = "Computer wins! 🤖 Click to try again.";
+          }
+        }
+
+        rolling = false;
+      }, 600);
+    }
+
+    document.body.addEventListener("click", rollDice);
+  </script>
+</body>
+</html>
